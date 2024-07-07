@@ -1,3 +1,8 @@
+header {
+  display: flex;
+  flex-direction: column;
+}
+
 .top-head {
   align-items: center;
   display: flex;

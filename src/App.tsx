@@ -44,16 +44,25 @@ class App extends Component<Record<string, never>, State> {
     this.fetchResults(term);
   };
 
+  throwError = () => {
+    throw new Error('Test error');
+  };
+
   render() {
     const { results, loading } = this.state;
 
     return (
       <ErrorBoundary>
         <main>
-          <h1 className="top-head">
-            <a href="https://pokeapi.co/" target="_blank">RESTfull api:</a>
-            <img src={pokeApiLogo} alt="Poke Api" width='200' height='70' />
-          </h1>
+          <header>
+            <h1 className="top-head">
+              <a href="https://pokeapi.co/" target="_blank">RESTfull api:</a>
+              <img src={pokeApiLogo} alt="Poke Api" width='200' height='70' />
+            </h1>
+            <div className="top-head">
+              <button onClick={this.throwError}>Throw Error</button>
+            </div>
+          </header>
           <section>
             <Search onSearch={this.handleSearch} />
           </section>
