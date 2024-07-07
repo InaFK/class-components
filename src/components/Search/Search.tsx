@@ -31,6 +31,7 @@ class Search extends Component<Props, State> {
       <div className="search-container">
         <input
           type="text"
+          name="search"
           value={this.state.searchTerm}
           onChange={this.handleInputChange}
         />
