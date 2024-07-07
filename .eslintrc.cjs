@@ -5,9 +5,10 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
     //'plugin:react-compiler/recommended',
+    'plugin:prettier/recommended',
     'prettier'
   ],
-  plugins: ['react', '@typescript-eslint', 'react-compiler', 'prettier'],
+  plugins: ['react', '@typescript-eslint', /*'react-compiler',*/npx husky-init && npm install 'prettier'],
   rules: {
     '@typescript-eslint/no-explicit-any': 'error',
     'prettier/prettier': 'error',

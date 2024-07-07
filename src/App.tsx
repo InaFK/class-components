@@ -56,8 +56,10 @@ class App extends Component<Record<string, never>, State> {
         <main>
           <header>
             <h1 className="top-head">
-              <a href="https://pokeapi.co/" target="_blank">RESTfull api:</a>
-              <img src={pokeApiLogo} alt="Poke Api" width='200' height='70' />
+              <a href="https://pokeapi.co/" target="_blank">
+                RESTfull api:
+              </a>
+              <img src={pokeApiLogo} alt="Poke Api" width="200" height="70" />
             </h1>
             <div className="top-head">
               <button onClick={this.throwError}>Throw Error</button>
