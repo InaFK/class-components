@@ -13,7 +13,7 @@ class ResultList extends Component<Props> {
       <div className="result-container">
         {results.map((result, index) => (
           <div key={index}>
-            <h3>{result.name}</h3>
+            <h2>{result.name}</h2>
             <p>{result.description}</p>
           </div>
         ))}

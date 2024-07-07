@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
+import pokeApiLogo from './assets/pokeapi_256.3fa72200.png';
 import Search from './components/Search/Search';
 import ResultList from './components/ResultList/ResultList';
+import './App.css';
 
 interface State {
   results: { name: string; description: string }[];
@@ -48,10 +50,14 @@ class App extends Component<Record<string, never>, State> {
     return (
       <ErrorBoundary>
         <main>
-          <section style={{ flex: '0 1 auto' }}>
+          <h1 className="top-head">
+            <a href="https://pokeapi.co/" target="_blank">RESTfull api:</a>
+            <img src={pokeApiLogo} alt="Poke Api" width='200' height='70' />
+          </h1>
+          <section>
             <Search onSearch={this.handleSearch} />
           </section>
-          <section style={{ flex: '1 1 auto', overflowY: 'auto' }}>
+          <section>
             {loading ? <p>Loading...</p> : <ResultList results={results} />}
           </section>
         </main>
