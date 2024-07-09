@@ -31,12 +31,10 @@ class App extends Component<Record<string, never>, State> {
       `);
       const data = await response.json();
       this.setState({
-        results: data.results.map(
-          (item: { name: string; description: string }) => ({
-            name: item.name,
-            description: item.url,
-          })
-        ),
+        results: data.results.map((item: { name: string; description: string }) => ({
+          name: item.name,
+          description: item.url,
+        })),
         loading: false,
       });
     } catch (error) {
@@ -50,7 +48,7 @@ class App extends Component<Record<string, never>, State> {
   };
 
   throwError = () => {
-    throw new Error('ErrorBoundary Test error');
+    throw new Error('Test error');
   };
 
   render() {
