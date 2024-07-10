@@ -57,7 +57,6 @@ class App extends Component<Record<string, never>, State> {
   };
 
   triggerError = () => {
-    console.log('Error button clicked');
     this.setState({ throwError: true });
   };
 
