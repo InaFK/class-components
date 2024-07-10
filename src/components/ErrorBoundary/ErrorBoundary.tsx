@@ -1,37 +1,51 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component } from 'react';
+import './ErrorBoundary.css';
 
-interface Props {
-  children: ReactNode;
-}
+type ErrorBoundaryProps = {
+  children: React.ReactNode;
+};
 
-interface State {
+type ErrorBoundaryState = {
   hasError: boolean;
-}
+};
 
-class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(): State {
+  static getDerivedStateFromError(error: Error) {
+    console.error('Error caught in getDerivedStateFromError:', error);
     return { hasError: true };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error caught by ErrorBoundary: ', error, errorInfo);
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // You can also log the error to an error reporting service
+    console.error('Error caught by ErrorBoundary:', error, errorInfo);
   }
 
   render() {
-    if (this.state.hasError) {
+    const { hasError } = this.state;
+    const { children } = this.props;
+    if (hasError) {
       return (
-        <div className="error-boundary-fallback">
-          <h2>Something went wrong.</h2>
+        <div className="error">
+          <h1 className="error-text">Something went wrong.</h1>
+          <p className="error-text">Let&apos;s try to reload the page.</p>
+          <button
+            type="button"
+            className="button-reload"
+            onClick={() => {
+              window.location.reload();
+            }}
+          >
+            Reload
+          </button>
         </div>
       );
     }
-
-    return this.props.children;
+    return children;
   }
 }
 

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import pokeApiLogo from './assets/pokeapi_256.3fa72200.png';
 import Search from './components/Search/Search';
 import ResultList from './components/ResultList/ResultList';
@@ -8,6 +7,7 @@ import './App.css';
 interface State {
   results: { name: string; description: string }[];
   loading: boolean;
+  throwError: boolean;
 }
 
 class App extends Component<Record<string, never>, State> {
@@ -16,11 +16,18 @@ class App extends Component<Record<string, never>, State> {
     this.state = {
       results: [],
       loading: false,
+      throwError: false,
     };
   }
 
   componentDidMount() {
     this.fetchResults(localStorage.getItem('searchTerm') || '');
+  }
+
+  componentDidUpdate(prevProps: Record<string, never>, prevState: State) {
+    if (this.state.throwError && !prevState.throwError) {
+      throw new Error('ErrorBoundary Test error');
+    }
   }
 
   fetchResults = async (term: string) => {
@@ -49,39 +56,38 @@ class App extends Component<Record<string, never>, State> {
     this.fetchResults(term);
   };
 
-  throwError = () => {
-    throw new Error('ErrorBoundary Test error');
+  triggerError = () => {
+    console.log('Error button clicked');
+    this.setState({ throwError: true });
   };
 
   render() {
     const { results, loading } = this.state;
 
     return (
-      <ErrorBoundary>
-        <main>
-          <header>
-            <h1 className="top-head">
-              <a
-                href="https://pokeapi.co/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                RESTfull api:
-              </a>
-              <img src={pokeApiLogo} alt="Poke Api" width="200" height="70" />
-            </h1>
-            <div className="top-head">
-              <button onClick={this.throwError}>Throw Error</button>
-            </div>
-          </header>
-          <section>
-            <Search onSearch={this.handleSearch} />
-          </section>
-          <section>
-            {loading ? <p>Loading...</p> : <ResultList results={results} />}
-          </section>
-        </main>
-      </ErrorBoundary>
+      <main>
+        <header>
+          <h1 className="top-head">
+            <a
+              href="https://pokeapi.co/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              RESTfull api:
+            </a>
+            <img src={pokeApiLogo} alt="Poke Api" width="200" height="70" />
+          </h1>
+          <div className="top-head">
+            <button onClick={this.triggerError}>Throw Error</button>
+          </div>
+        </header>
+        <section>
+          <Search onSearch={this.handleSearch} />
+        </section>
+        <section>
+          {loading ? <p>Loading...</p> : <ResultList results={results} />}
+        </section>
+      </main>
     );
   }
 }
