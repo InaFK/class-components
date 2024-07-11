@@ -53,11 +53,14 @@ class App extends Component<Record<string, never>, State> {
   };
 
   fetchResults = async (term: string) => {
+    if (term.trim() === '') {
+      this.fetchInitialResults();
+      return;
+    }
+
     this.setState({ loading: true, results: [], errorMessage: null });
     try {
-      const response = await fetch(`
-        https://pokeapi.co/api/v2/pokemon/${term}
-      `);
+      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${term}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }

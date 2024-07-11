@@ -17,14 +17,20 @@ class Search extends Component<Props, State> {
   }
 
   handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ searchTerm: event.target.value });
+    const searchTerm = event.target.value;
+    this.setState({ searchTerm }, () => {
+      localStorage.setItem('searchTerm', searchTerm.trim());
+      if (searchTerm.trim().length >= 3 || searchTerm.trim().length === 0) {
+        this.props.onSearch(searchTerm.trim());
+      }
+    });
   };
 
   handleSearch = () => {
     const { searchTerm } = this.state;
     const trimmedTerm = searchTerm.trim();
-    if (trimmedTerm) {
-      localStorage.setItem('searchTerm', trimmedTerm);
+    localStorage.setItem('searchTerm', trimmedTerm);
+    if (trimmedTerm.length >= 3 || trimmedTerm.length === 0) {
       this.props.onSearch(trimmedTerm);
     }
   };
@@ -33,7 +39,7 @@ class Search extends Component<Props, State> {
     return (
       <div className="search-container">
         <input
-          type="text"
+          type="search"
           name="search"
           value={this.state.searchTerm}
           onChange={this.handleInputChange}
