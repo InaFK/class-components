@@ -21,9 +21,12 @@ class Search extends Component<Props, State> {
   };
 
   handleSearch = () => {
-    const trimmedTerm = this.state.searchTerm.trim();
-    localStorage.setItem('searchTerm', trimmedTerm);
-    this.props.onSearch(trimmedTerm);
+    const { searchTerm } = this.state;
+    const trimmedTerm = searchTerm.trim();
+    if (trimmedTerm) {
+      localStorage.setItem('searchTerm', trimmedTerm);
+      this.props.onSearch(trimmedTerm);
+    }
   };
 
   render() {

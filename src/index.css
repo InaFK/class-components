@@ -78,6 +78,7 @@ button:focus-visible {
 }
 
 main {
+  height: 100vh;
   padding: 20px 0;
   width: 100%;
 }
