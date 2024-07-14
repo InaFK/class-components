@@ -1,53 +1,47 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Search.css';
 
 interface Props {
   onSearch: (term: string) => void;
 }
 
-interface State {
-  searchTerm: string;
-}
+const useSearchQuery = () => {
+  const [searchQuery, setSearchQuery] = useState<string>(() => {
+    return localStorage.getItem('searchQuery') || '';
+  });
 
-class Search extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    const savedTerm = localStorage.getItem('searchTerm') || '';
-    this.state = { searchTerm: savedTerm.trim() };
-  }
+  useEffect(() => {
+    return () => {
+      localStorage.setItem('searchQuery', searchQuery);
+    };
+  }, [searchQuery]);
 
-  handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = event.target.value;
-    this.setState({ searchTerm }, () => {
-      localStorage.setItem('searchTerm', searchTerm.trim());
-      if (searchTerm.trim().length >= 3 || searchTerm.trim().length === 0) {
-        this.props.onSearch(searchTerm.trim());
-      }
-    });
+  return [searchQuery, setSearchQuery] as const;
+};
+
+const Search: React.FC<Props> = ({ onSearch }) => {
+  const [searchQuery, setSearchQuery] = useSearchQuery();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
-  handleSearch = () => {
-    const { searchTerm } = this.state;
-    const trimmedTerm = searchTerm.trim();
-    localStorage.setItem('searchTerm', trimmedTerm);
-    if (trimmedTerm.length >= 3 || trimmedTerm.length === 0) {
-      this.props.onSearch(trimmedTerm);
-    }
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onSearch(searchQuery);
   };
 
-  render() {
-    return (
-      <div className="search-container">
-        <input
-          type="search"
-          name="search"
-          value={this.state.searchTerm}
-          onChange={this.handleInputChange}
-        />
-        <button onClick={this.handleSearch}>Search</button>
-      </div>
-    );
-  }
-}
+  return (
+    <form onSubmit={handleSubmit} className="search-container">
+      <input
+        type="search"
+        value={searchQuery}
+        onChange={handleChange}
+        placeholder="Search for a Pokémon..."
+      />
+      <button type="submit">Search</button>
+    </form>
+  );
+};
 
 export default Search;
