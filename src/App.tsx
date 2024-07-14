@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import pokeApiLogo from './assets/pokeapi_256.3fa72200.png';
 import Search from './components/Search/Search';
 import ResultList from './components/ResultList/ResultList';
+import Pagination from './components/Pagination/Pagination';
 import './App.css';
 
 const App: React.FC = () => {
@@ -11,10 +13,15 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [throwError, setThrowError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const query = new URLSearchParams(location.search);
+  const page = parseInt(query.get('page') || '1', 10);
+  const limit = 10;
 
   useEffect(() => {
-    fetchInitialResults();
-  }, []);
+    fetchResults(page);
+  }, [page]);
 
   useEffect(() => {
     if (throwError) {
@@ -22,11 +29,12 @@ const App: React.FC = () => {
     }
   }, [throwError]);
 
-  const fetchInitialResults = async () => {
+  const fetchResults = async (page: number) => {
     setLoading(true);
+    const offset = (page - 1) * limit;
     try {
       const response = await fetch(
-        'https://pokeapi.co/api/v2/pokemon?limit=10&offset=0'
+        `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`
       );
       const data = await response.json();
       setResults(
@@ -42,9 +50,9 @@ const App: React.FC = () => {
     }
   };
 
-  const fetchResults = async (term: string) => {
+  const fetchSearchedResults = async (term: string) => {
     if (term.trim() === '') {
-      fetchInitialResults();
+      fetchResults(page);
       return;
     }
 
@@ -67,7 +75,12 @@ const App: React.FC = () => {
   };
 
   const handleSearch = (term: string) => {
-    fetchResults(term);
+    navigate('/?page=1');
+    fetchSearchedResults(term);
+  };
+
+  const goToPage = (newPage: number) => {
+    navigate(`/?page=${newPage}`);
   };
 
   const triggerError = () => {
@@ -94,10 +107,11 @@ const App: React.FC = () => {
       <section>
         <Search onSearch={handleSearch} />
       </section>
-      <section>
+      <section className="result">
         {loading && <p>Loading...</p>}
         {errorMessage && <p>{errorMessage}</p>}
         {!loading && !errorMessage && <ResultList results={results} />}
+        <Pagination currentPage={page} onPageChange={goToPage} />
       </section>
     </main>
   );
