@@ -5,23 +5,25 @@ import Search from './components/Search/Search';
 import ResultList from './components/ResultList/ResultList';
 import Pagination from './components/Pagination/Pagination';
 import './App.css';
+import { useGetPokemonsQuery, useGetPokemonDetailsQuery } from './services/pokemonApi';
 
 const App: React.FC = () => {
-  const [results, setResults] = useState<
-    { name: string; description: string }[]
-  >([]);
-  const [loading, setLoading] = useState<boolean>(false);
   const [throwError, setThrowError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string | null>(null);
+
   const location = useLocation();
   const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
   const page = parseInt(query.get('page') || '1', 10);
-  const limit = 10;
 
-  useEffect(() => {
-    fetchResults(page);
-  }, [page]);
+  const limit = 10;
+  const offset = (page - 1) * limit;
+
+  const { data: pokemonListData, error: listError, isLoading: listLoading } = useGetPokemonsQuery({ limit, offset });
+  const { data: searchedPokemonData, error: searchError, isLoading: searchLoading } = useGetPokemonDetailsQuery(searchTerm, {
+    skip: !searchTerm
+  });
 
   useEffect(() => {
     if (throwError) {
@@ -29,63 +31,39 @@ const App: React.FC = () => {
     }
   }, [throwError]);
 
-  const fetchResults = async (page: number) => {
-    setLoading(true);
-    const offset = (page - 1) * limit;
-    try {
-      const response = await fetch(
-        `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`
-      );
-      const data = await response.json();
-      setResults(
-        data.results.map((item: { name: string; url: string }) => ({
-          name: item.name,
-          description: item.url,
-        }))
-      );
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching initial results:', error);
-      setLoading(false);
-    }
-  };
-
-  const fetchSearchedResults = async (term: string) => {
-    if (term.trim() === '') {
-      fetchResults(page);
-      return;
-    }
-
-    setLoading(true);
-    setResults([]);
-    setErrorMessage(null);
-    try {
-      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${term}`);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      setResults([{ name: data.name, description: data.species.url }]);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching results:', error);
-      setLoading(false);
-      setErrorMessage('No results found for the given term');
-    }
-  };
-
   const handleSearch = (term: string) => {
+    setSearchTerm(term.trim() === '' ? null : term);
+    setErrorMessage(null);
     navigate('/?page=1');
-    fetchSearchedResults(term);
   };
 
   const goToPage = (newPage: number) => {
+    setSearchTerm(null);
     navigate(`/?page=${newPage}`);
   };
 
   const triggerError = () => {
     setThrowError(true);
   };
+
+  const loading = searchTerm ? searchLoading : listLoading;
+  const error = searchTerm ? searchError : listError;
+  const results = searchTerm
+    ? searchedPokemonData
+      ? [{ name: searchedPokemonData.name, description: searchedPokemonData.species.url }]
+      : []
+    : pokemonListData
+    ? pokemonListData.results.map((item: { name: string; url: string }) => ({
+        name: item.name,
+        description: item.url,
+      }))
+    : [];
+
+  useEffect(() => {
+    if (error) {
+      setErrorMessage('No results found for the given term');
+    }
+  }, [error]);
 
   return (
     <main>
