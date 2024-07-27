@@ -5,9 +5,14 @@ import Search from './components/Search/Search';
 import ResultList from './components/ResultList/ResultList';
 import Pagination from './components/Pagination/Pagination';
 import './App.css';
-import { useGetPokemonsQuery, useGetPokemonDetailsQuery } from './services/pokemonApi';
+import {
+  useGetPokemonsQuery,
+  useGetPokemonDetailsQuery,
+} from './services/pokemonApi';
+import { useTheme } from './context/ThemeContext';
 
 const App: React.FC = () => {
+  const { theme, toggleTheme } = useTheme();
   const [throwError, setThrowError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
@@ -20,9 +25,17 @@ const App: React.FC = () => {
   const limit = 10;
   const offset = (page - 1) * limit;
 
-  const { data: pokemonListData, error: listError, isLoading: listLoading } = useGetPokemonsQuery({ limit, offset });
-  const { data: searchedPokemonData, error: searchError, isLoading: searchLoading } = useGetPokemonDetailsQuery(searchTerm, {
-    skip: !searchTerm
+  const {
+    data: pokemonListData,
+    error: listError,
+    isLoading: listLoading,
+  } = useGetPokemonsQuery({ limit, offset });
+  const {
+    data: searchedPokemonData,
+    error: searchError,
+    isLoading: searchLoading,
+  } = useGetPokemonDetailsQuery(searchTerm, {
+    skip: !searchTerm,
   });
 
   useEffect(() => {
@@ -30,6 +43,10 @@ const App: React.FC = () => {
       throw new Error('ErrorBoundary Test error');
     }
   }, [throwError]);
+
+  useEffect(() => {
+    document.body.className = theme + '-theme';
+  }, [theme]);
 
   const handleSearch = (term: string) => {
     setSearchTerm(term.trim() === '' ? null : term);
@@ -50,14 +67,19 @@ const App: React.FC = () => {
   const error = searchTerm ? searchError : listError;
   const results = searchTerm
     ? searchedPokemonData
-      ? [{ name: searchedPokemonData.name, description: searchedPokemonData.species.url }]
+      ? [
+          {
+            name: searchedPokemonData.name,
+            description: searchedPokemonData.species.url,
+          },
+        ]
       : []
     : pokemonListData
-    ? pokemonListData.results.map((item: { name: string; url: string }) => ({
-        name: item.name,
-        description: item.url,
-      }))
-    : [];
+      ? pokemonListData.results.map((item: { name: string; url: string }) => ({
+          name: item.name,
+          description: item.url,
+        }))
+      : [];
 
   useEffect(() => {
     if (error) {
@@ -80,6 +102,9 @@ const App: React.FC = () => {
         </h1>
         <div className="top-head">
           <button onClick={triggerError}>Throw Error</button>
+          <button onClick={toggleTheme}>
+            Toggle to {theme === 'light' ? 'Dark' : 'Light'} Theme
+          </button>
         </div>
       </header>
       <section>

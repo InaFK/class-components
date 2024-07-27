@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { pokemonApi } from './services/pokemonApi';
-import rootReducer, { RootState } from './reducers';
+import rootReducer from './reducers';
 
 const store = configureStore({
   reducer: {
@@ -14,5 +14,3 @@ const store = configureStore({
 export type AppDispatch = typeof store.dispatch;
 
 export default store;
-
-
