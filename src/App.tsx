@@ -44,10 +44,6 @@ const App: React.FC = () => {
     }
   }, [throwError]);
 
-  useEffect(() => {
-    document.body.className = theme + '-theme';
-  }, [theme]);
-
   const handleSearch = (term: string) => {
     setSearchTerm(term.trim() === '' ? null : term);
     setErrorMessage(null);

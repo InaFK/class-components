@@ -1,24 +1,25 @@
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState } from 'react';
 
 export type Theme = 'light' | 'dark';
 
-// Create a context with a default value
-export const ThemeContext = createContext<{
+interface ThemeContextProps {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-}>({
+}
+
+export const ThemeContext = createContext<ThemeContextProps>({
   theme: 'light',
   setTheme: () => {},
 });
 
-export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>('light');
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
-      {children}
+      <div className={`main-wrapper ${theme}-theme`}>
+        {children}
+      </div>
     </ThemeContext.Provider>
   );
 };
