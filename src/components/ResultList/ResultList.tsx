@@ -23,10 +23,7 @@ const ResultList: React.FC<Props> = ({ results }) => {
     <div className="result-container">
       {results.map((result, index) => (
         <div key={index} className="result-item">
-          <input
-            type="checkbox"
-            onChange={() => handleSelect(result)}
-          />
+          <input type="checkbox" onChange={() => handleSelect(result)} />
           <div>
             <h3>{result.name}</h3>
             <p>{result.description}</p>
