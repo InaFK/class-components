@@ -3,10 +3,7 @@ import { pokemonApi } from './services/pokemonApi';
 import rootReducer from './reducers';
 
 const store = configureStore({
-  reducer: {
-    [pokemonApi.reducerPath]: pokemonApi.reducer,
-    ...rootReducer,
-  },
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(pokemonApi.middleware),
 });

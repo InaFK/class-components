@@ -1,22 +1,33 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { pokemonApi } from '../services/pokemonApi';
 
+interface Result {
+  name: string;
+  description: string;
+}
+
 interface PokemonState {
-  results: { name: string; description: string }[];
+  results: Result[];
   isLoading: boolean;
   error: string | null;
+  selectedItem: Result | null;
 }
 
 const initialState: PokemonState = {
   results: [],
   isLoading: false,
   error: null,
+  selectedItem: null,
 };
 
 const pokemonSlice = createSlice({
   name: 'pokemon',
   initialState,
-  reducers: {},
+  reducers: {
+    setSelectedItem: (state, action: PayloadAction<Result | null>) => {
+      state.selectedItem = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addMatcher(pokemonApi.endpoints.getPokemons.matchPending, (state) => {
@@ -43,5 +54,7 @@ const pokemonSlice = createSlice({
       );
   },
 });
+
+export const { setSelectedItem } = pokemonSlice.actions;
 
 export default pokemonSlice.reducer;

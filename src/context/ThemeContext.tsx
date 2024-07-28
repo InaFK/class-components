@@ -12,14 +12,14 @@ export const ThemeContext = createContext<ThemeContextProps>({
   setTheme: () => {},
 });
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [theme, setTheme] = useState<Theme>('light');
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
-      <div className={`main-wrapper ${theme}-theme`}>
-        {children}
-      </div>
+      <div className={`main-wrapper ${theme}-theme`}>{children}</div>
     </ThemeContext.Provider>
   );
 };
