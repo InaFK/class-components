@@ -5,17 +5,22 @@ import Search from './components/Search/Search';
 import ResultList from './components/ResultList/ResultList';
 import Pagination from './components/Pagination/Pagination';
 import './App.css';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   useGetPokemonsQuery,
   useGetPokemonDetailsQuery,
 } from './services/pokemonApi';
 import { useTheme } from './hooks/useTheme';
+import { RootState } from './reducers';
+import { setSelectedItems } from './reducers/pokemonSlice';
 
 const App: React.FC = () => {
   const { theme, setTheme } = useTheme();
   const [throwError, setThrowError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
+  const dispatch = useDispatch();
+  const selectedItems = useSelector((state: RootState) => state.pokemon.selectedItems);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -43,6 +48,12 @@ const App: React.FC = () => {
       throw new Error('ErrorBoundary Test error');
     }
   }, [throwError]);
+
+  useEffect(() => {
+    if (pokemonListData) {
+      dispatch(setSelectedItems(selectedItems));
+    }
+  }, [pokemonListData, dispatch, selectedItems]);
 
   const handleSearch = (term: string) => {
     setSearchTerm(term.trim() === '' ? null : term);
