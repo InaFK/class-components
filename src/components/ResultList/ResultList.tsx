@@ -15,7 +15,9 @@ interface Props {
 
 const ResultList: React.FC<Props> = ({ results }) => {
   const dispatch = useDispatch();
-  const selectedItems = useSelector((state: RootState) => state.pokemon.selectedItems);
+  const selectedItems = useSelector(
+    (state: RootState) => state.pokemon.selectedItems
+  );
 
   const handleSelect = (name: string) => {
     dispatch(toggleSelectedItem(name));

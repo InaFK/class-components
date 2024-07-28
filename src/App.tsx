@@ -4,6 +4,7 @@ import pokeApiLogo from './assets/pokeapi_256.3fa72200.png';
 import Search from './components/Search/Search';
 import ResultList from './components/ResultList/ResultList';
 import Pagination from './components/Pagination/Pagination';
+import Flyout from './components/Flyout/Flyout';
 import './App.css';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -20,7 +21,9 @@ const App: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
   const dispatch = useDispatch();
-  const selectedItems = useSelector((state: RootState) => state.pokemon.selectedItems);
+  const selectedItems = useSelector(
+    (state: RootState) => state.pokemon.selectedItems
+  );
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -127,6 +130,7 @@ const App: React.FC = () => {
         {!loading && !errorMessage && <ResultList results={results} />}
         <Pagination currentPage={page} onPageChange={goToPage} />
       </section>
+      <Flyout selectedCount={selectedItems.length} />
     </main>
   );
 };

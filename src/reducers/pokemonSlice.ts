@@ -27,7 +27,9 @@ const pokemonSlice = createSlice({
     toggleSelectedItem: (state, action: PayloadAction<string>) => {
       const itemName = action.payload;
       if (state.selectedItems.includes(itemName)) {
-        state.selectedItems = state.selectedItems.filter(name => name !== itemName);
+        state.selectedItems = state.selectedItems.filter(
+          (name) => name !== itemName
+        );
       } else {
         state.selectedItems.push(itemName);
       }
