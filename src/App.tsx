@@ -9,10 +9,10 @@ import {
   useGetPokemonsQuery,
   useGetPokemonDetailsQuery,
 } from './services/pokemonApi';
-import { useTheme } from './context/ThemeContext';
+import { useTheme } from './hooks/useTheme';
 
 const App: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [throwError, setThrowError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
@@ -61,6 +61,10 @@ const App: React.FC = () => {
 
   const triggerError = () => {
     setThrowError(true);
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
   };
 
   const loading = searchTerm ? searchLoading : listLoading;
