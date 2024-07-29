@@ -13,7 +13,7 @@ import {
 } from './services/pokemonApi';
 import { useTheme } from './hooks/useTheme';
 import { RootState } from './reducers';
-import { setSelectedItems } from './reducers/pokemonSlice';
+import { toggleSelectedItem, unselectAllItems } from './reducers/pokemonSlice';
 
 const App: React.FC = () => {
   const { theme, setTheme } = useTheme();
@@ -52,12 +52,6 @@ const App: React.FC = () => {
     }
   }, [throwError]);
 
-  useEffect(() => {
-    if (pokemonListData) {
-      dispatch(setSelectedItems(selectedItems));
-    }
-  }, [pokemonListData, dispatch, selectedItems]);
-
   const handleSearch = (term: string) => {
     setSearchTerm(term.trim() === '' ? null : term);
     setErrorMessage(null);
@@ -89,17 +83,34 @@ const App: React.FC = () => {
         ]
       : []
     : pokemonListData
-      ? pokemonListData.results.map((item: { name: string; url: string }) => ({
-          name: item.name,
-          description: item.url,
-        }))
-      : [];
+    ? pokemonListData.results.map((item: { name: string; url: string }) => ({
+        name: item.name,
+        description: item.url,
+      }))
+    : [];
 
   useEffect(() => {
     if (error) {
       setErrorMessage('No results found for the given term');
     }
   }, [error]);
+
+  const handleUnselectAll = () => {
+    dispatch(unselectAllItems());
+  };
+
+  const handleDownload = () => {
+    const csvContent = `data:text/csv;charset=utf-8,${selectedItems
+      .map((item) => `${item.name},${item.description}`)
+      .join('\n')}`;
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `${selectedItems.length}_items.csv`);
+    document.body.appendChild(link); // Required for FF
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <main>
@@ -127,10 +138,16 @@ const App: React.FC = () => {
       <section className="result">
         {loading && <p>Loading...</p>}
         {errorMessage && <p>{errorMessage}</p>}
-        {!loading && !errorMessage && <ResultList results={results} />}
+        {!loading && !errorMessage && (
+          <ResultList results={results} />
+        )}
         <Pagination currentPage={page} onPageChange={goToPage} />
       </section>
-      <Flyout selectedCount={selectedItems.length} />
+      <Flyout
+        selectedCount={selectedItems.length}
+        onUnselectAll={handleUnselectAll}
+        onDownload={handleDownload}
+      />
     </main>
   );
 };

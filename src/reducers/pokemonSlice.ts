@@ -10,7 +10,7 @@ interface PokemonState {
   results: Result[];
   isLoading: boolean;
   error: string | null;
-  selectedItems: string[];
+  selectedItems: Result[];
 }
 
 const initialState: PokemonState = {
@@ -24,18 +24,17 @@ const pokemonSlice = createSlice({
   name: 'pokemon',
   initialState,
   reducers: {
-    toggleSelectedItem: (state, action: PayloadAction<string>) => {
-      const itemName = action.payload;
-      if (state.selectedItems.includes(itemName)) {
-        state.selectedItems = state.selectedItems.filter(
-          (name) => name !== itemName
-        );
+    toggleSelectedItem: (state, action: PayloadAction<Result>) => {
+      const item = action.payload;
+      const index = state.selectedItems.findIndex((i) => i.name === item.name);
+      if (index >= 0) {
+        state.selectedItems.splice(index, 1);
       } else {
-        state.selectedItems.push(itemName);
+        state.selectedItems.push(item);
       }
     },
-    setSelectedItems: (state, action: PayloadAction<string[]>) => {
-      state.selectedItems = action.payload;
+    unselectAllItems: (state) => {
+      state.selectedItems = [];
     },
   },
   extraReducers: (builder) => {
@@ -65,6 +64,6 @@ const pokemonSlice = createSlice({
   },
 });
 
-export const { toggleSelectedItem, setSelectedItems } = pokemonSlice.actions;
+export const { toggleSelectedItem, unselectAllItems } = pokemonSlice.actions;
 
-export default pokemonSlice.reducer;
+export default pokemonSlice.reducer

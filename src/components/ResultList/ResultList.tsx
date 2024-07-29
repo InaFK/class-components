@@ -19,8 +19,8 @@ const ResultList: React.FC<Props> = ({ results }) => {
     (state: RootState) => state.pokemon.selectedItems
   );
 
-  const handleSelect = (name: string) => {
-    dispatch(toggleSelectedItem(name));
+  const handleSelect = (result: Result) => {
+    dispatch(toggleSelectedItem(result));
   };
 
   return (
@@ -29,8 +29,8 @@ const ResultList: React.FC<Props> = ({ results }) => {
         <div key={index} className="result-item">
           <input
             type="checkbox"
-            checked={selectedItems.includes(result.name)}
-            onChange={() => handleSelect(result.name)}
+            checked={selectedItems.some((item) => item.name === result.name)}
+            onChange={() => handleSelect(result)}
           />
           <div>
             <h3>{result.name}</h3>
