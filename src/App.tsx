@@ -13,7 +13,7 @@ import {
 } from './services/pokemonApi';
 import { useTheme } from './hooks/useTheme';
 import { RootState } from './reducers';
-import { toggleSelectedItem, unselectAllItems } from './reducers/pokemonSlice';
+import { unselectAllItems } from './reducers/pokemonSlice';
 
 const App: React.FC = () => {
   const { theme, setTheme } = useTheme();
@@ -83,11 +83,11 @@ const App: React.FC = () => {
         ]
       : []
     : pokemonListData
-    ? pokemonListData.results.map((item: { name: string; url: string }) => ({
-        name: item.name,
-        description: item.url,
-      }))
-    : [];
+      ? pokemonListData.results.map((item: { name: string; url: string }) => ({
+          name: item.name,
+          description: item.url,
+        }))
+      : [];
 
   useEffect(() => {
     if (error) {
@@ -138,9 +138,7 @@ const App: React.FC = () => {
       <section className="result">
         {loading && <p>Loading...</p>}
         {errorMessage && <p>{errorMessage}</p>}
-        {!loading && !errorMessage && (
-          <ResultList results={results} />
-        )}
+        {!loading && !errorMessage && <ResultList results={results} />}
         <Pagination currentPage={page} onPageChange={goToPage} />
       </section>
       <Flyout

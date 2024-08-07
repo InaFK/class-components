@@ -66,4 +66,4 @@ const pokemonSlice = createSlice({
 
 export const { toggleSelectedItem, unselectAllItems } = pokemonSlice.actions;
 
-export default pokemonSlice.reducer
+export default pokemonSlice.reducer;
