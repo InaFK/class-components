@@ -11,9 +11,7 @@ const useSearchQuery = () => {
   });
 
   useEffect(() => {
-    return () => {
-      localStorage.setItem('searchQuery', searchQuery);
-    };
+    localStorage.setItem('searchQuery', searchQuery);
   }, [searchQuery]);
 
   return [searchQuery, setSearchQuery] as const;
