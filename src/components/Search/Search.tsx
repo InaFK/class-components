@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Search.css';
+import styles from './Search.module.css';
 
 interface Props {
   onSearch: (term: string) => void;
@@ -7,7 +7,10 @@ interface Props {
 
 const useSearchQuery = () => {
   const [searchQuery, setSearchQuery] = useState<string>(() => {
-    return localStorage.getItem('searchQuery') || '';
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('searchQuery') || '';
+    }
+    return '';
   });
 
   useEffect(() => {
@@ -30,7 +33,7 @@ const Search: React.FC<Props> = ({ onSearch }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="search-container">
+    <form onSubmit={handleSubmit} className={styles['search-container']}>
       <input
         type="search"
         value={searchQuery}

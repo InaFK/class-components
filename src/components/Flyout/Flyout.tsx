@@ -1,5 +1,5 @@
 import React from 'react';
-import './Flyout.css';
+import styles from './Flyout.module.css';
 
 interface FlyoutProps {
   selectedCount: number;
@@ -15,7 +15,7 @@ const Flyout: React.FC<FlyoutProps> = ({
   if (selectedCount === 0) return null;
 
   return (
-    <div className="flyout">
+    <div className={styles['flyout']}>
       <p>{selectedCount} items are selected</p>
       <button onClick={onUnselectAll}>Unselect all</button>
       <button onClick={onDownload}>Download</button>

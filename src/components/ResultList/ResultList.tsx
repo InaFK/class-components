@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../reducers';
 import { toggleSelectedItem } from '../../reducers/pokemonSlice';
-import './ResultList.css';
+import styles from './ResultList.module.css';
 
 interface Result {
   name: string;
@@ -24,9 +24,9 @@ const ResultList: React.FC<Props> = ({ results }) => {
   };
 
   return (
-    <div className="result-container">
+    <div className={styles['result-container']}>
       {results.map((result, index) => (
-        <div key={index} className="result-item">
+        <div key={index} className={styles['result-item']}>
           <input
             type="checkbox"
             checked={selectedItems.some((item) => item.name === result.name)}

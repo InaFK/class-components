@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import './ErrorBoundary.css';
+import styles from './ErrorBoundary.module.css';
 
 type ErrorBoundaryProps = {
   children: React.ReactNode;
@@ -28,12 +28,12 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     const { children } = this.props;
     if (hasError) {
       return (
-        <div className="error">
-          <h1 className="error-text">Something went wrong.</h1>
-          <p className="error-text">Let&apos;s try to reload the page.</p>
+        <div className={styles['error']}>
+          <h1 className={styles['error-text']}>Something went wrong.</h1>
+          <p className={styles['error-text']}>Let&apos;s try to reload the page.</p>
           <button
             type="button"
-            className="button-reload"
+            className={styles['button-reload']}
             onClick={() => {
               window.location.reload();
             }}

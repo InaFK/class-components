@@ -1,5 +1,5 @@
 import React from 'react';
-import './Pagination.css';
+import styles from './Pagination.module.css';
 
 interface PaginationProps {
   currentPage: number;
@@ -21,7 +21,7 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="pagination">
+    <div className={styles['pagination']}>
       <button onClick={handlePrevious} disabled={currentPage === 1}>
         Previous
       </button>
