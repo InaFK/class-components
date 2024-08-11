@@ -6,15 +6,19 @@ import ResultList from '../src/components/ResultList/ResultList';
 import Pagination from '../src/components/Pagination/Pagination';
 import Flyout from '../src/components/Flyout/Flyout';
 import { useDispatch, useSelector } from 'react-redux';
-import { useGetPokemonsQuery, useGetPokemonDetailsQuery } from '../src/services/pokemonApi';
+import {
+  useGetPokemonsQuery,
+  useGetPokemonDetailsQuery,
+} from '../src/services/pokemonApi';
 import { useTheme } from '../src/hooks/useTheme';
 import { RootState } from '../src/reducers';
 import { unselectAllItems } from '../src/reducers/pokemonSlice';
 import { useRouter } from 'next/router';
 
-const HomePage: React.FC = () => {
+const HomePage: React.FC<{
+  setErrorMessage: (msg: string | null) => void;
+}> = () => {
   const { theme, setTheme } = useTheme();
-  const [throwError, setThrowError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
   const dispatch = useDispatch();
@@ -23,7 +27,7 @@ const HomePage: React.FC = () => {
   );
 
   const router = useRouter();
-  const page = parseInt(router.query.page as string || '1', 10);
+  const page = parseInt((router.query.page as string) || '1', 10);
 
   const limit = 10;
   const offset = (page - 1) * limit;
@@ -41,12 +45,6 @@ const HomePage: React.FC = () => {
     skip: !searchTerm,
   });
 
-  useEffect(() => {
-    if (throwError) {
-      throw new Error('ErrorBoundary Test error');
-    }
-  }, [throwError]);
-
   const handleSearch = (term: string) => {
     setSearchTerm(term.trim() === '' ? null : term);
     setErrorMessage(null);
@@ -56,10 +54,6 @@ const HomePage: React.FC = () => {
   const goToPage = (newPage: number) => {
     setSearchTerm(null);
     router.push(`/?page=${newPage}`);
-  };
-
-  const triggerError = () => {
-    setThrowError(true);
   };
 
   const toggleTheme = () => {
@@ -78,11 +72,17 @@ const HomePage: React.FC = () => {
         ]
       : []
     : pokemonListData
-    ? pokemonListData.results.map((item: { name: string; url: string }) => ({
-        name: item.name,
-        description: item.url,
-      }))
-    : [];
+      ? pokemonListData.results.map((item: { name: string; url: string }) => ({
+          name: item.name,
+          description: item.url,
+        }))
+      : [];
+
+  useEffect(() => {
+    if (errorMessage) {
+      setErrorMessage(errorMessage);
+    }
+  }, [errorMessage]);
 
   useEffect(() => {
     if (error) {
@@ -111,14 +111,19 @@ const HomePage: React.FC = () => {
     <main>
       <header>
         <h1 className="top-head">
-          <a href="https://pokeapi.co/" target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://pokeapi.co/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             RESTful API:
           </a>
           <Image src={pokeApiLogo} alt="Poke Api" width="200" height="70" />
-          {/* <img src={pokeApiLogo} alt="Poke Api" width="200" height="70" /> */}
         </h1>
         <div className="top-head">
-          <button onClick={triggerError}>Throw Error</button>
+          <button onClick={() => setErrorMessage('Simulated ErrorBoundary')}>
+            Simulate ErrorBoundary
+          </button>
           <button onClick={toggleTheme}>
             Toggle to {theme === 'light' ? 'Dark' : 'Light'} Theme
           </button>
@@ -129,9 +134,20 @@ const HomePage: React.FC = () => {
       </section>
       <section className="result">
         {loading && <p>Loading...</p>}
-        {errorMessage && <p>{errorMessage}</p>}
-        {!loading && !errorMessage && <ResultList results={results} />}
-        <Pagination currentPage={page} onPageChange={goToPage} />
+        {errorMessage && (
+          <>
+            <p>{errorMessage}</p>
+            <button type="button" onClick={() => window.location.reload()}>
+              Reload Page
+            </button>
+          </>
+        )}
+        {!loading && !errorMessage && (
+          <>
+            <ResultList results={results} />
+            <Pagination currentPage={page} onPageChange={goToPage} />
+          </>
+        )}
       </section>
       <Flyout
         selectedCount={selectedItems.length}

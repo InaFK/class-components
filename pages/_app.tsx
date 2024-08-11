@@ -7,10 +7,19 @@ import { ThemeProvider } from '../src/context/ThemeContext';
 import '../src/styles/index.css';
 import '../src/styles/theme.css';
 
-function MyApp({ Component, pageProps }: AppProps) {
+interface MyAppProps extends AppProps {
+  pageProps: {
+    errorMessage?: string | null;
+    [key: string]: string; // Allow other properties in pageProps
+  };
+}
+
+function MyApp({ Component, pageProps }: MyAppProps) {
+  const errorMessage = pageProps?.errorMessage || null;
+
   return (
     <React.StrictMode>
-      <ErrorBoundary>
+      <ErrorBoundary errorMessage={errorMessage}>
         <Provider store={store}>
           <ThemeProvider>
             <Component {...pageProps} />
