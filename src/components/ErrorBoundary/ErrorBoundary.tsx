@@ -1,8 +1,9 @@
-import { Component } from 'react';
-import './ErrorBoundary.css';
+import React, { Component } from 'react';
+import styles from './ErrorBoundary.module.css';
 
 type ErrorBoundaryProps = {
   children: React.ReactNode;
+  errorMessage?: string | null;
 };
 
 type ErrorBoundaryState = {
@@ -19,6 +20,15 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     return { hasError: true };
   }
 
+  componentDidUpdate(prevProps: ErrorBoundaryProps) {
+    if (
+      prevProps.errorMessage !== this.props.errorMessage &&
+      this.props.errorMessage
+    ) {
+      this.setState({ hasError: true });
+    }
+  }
+
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Error caught by ErrorBoundary:', error, errorInfo);
   }
@@ -26,14 +36,17 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   render() {
     const { hasError } = this.state;
     const { children } = this.props;
+
     if (hasError) {
       return (
-        <div className="error">
-          <h1 className="error-text">Something went wrong.</h1>
-          <p className="error-text">Let&apos;s try to reload the page.</p>
+        <div className={styles['error']}>
+          <h1 className={styles['error-text']}>Something went wrong.</h1>
+          <p className={styles['error-text']}>
+            Let&apos;s try to reload the page.
+          </p>
           <button
             type="button"
-            className="button-reload"
+            className={styles['button-reload']}
             onClick={() => {
               window.location.reload();
             }}
@@ -43,6 +56,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
         </div>
       );
     }
+
     return children;
   }
 }
