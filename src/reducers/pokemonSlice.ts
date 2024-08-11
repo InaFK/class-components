@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { pokemonApi } from '../services/pokemonApi';
 
 interface Result {
   name: string;
@@ -24,6 +23,9 @@ const pokemonSlice = createSlice({
   name: 'pokemon',
   initialState,
   reducers: {
+    setResults: (state, action: PayloadAction<Result[]>) => {
+      state.results = action.payload;
+    },
     toggleSelectedItem: (state, action: PayloadAction<Result>) => {
       const item = action.payload;
       const index = state.selectedItems.findIndex((i) => i.name === item.name);
@@ -36,34 +38,21 @@ const pokemonSlice = createSlice({
     unselectAllItems: (state) => {
       state.selectedItems = [];
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addMatcher(pokemonApi.endpoints.getPokemons.matchPending, (state) => {
-        state.isLoading = true;
-      })
-      .addMatcher(
-        pokemonApi.endpoints.getPokemons.matchFulfilled,
-        (state, { payload }) => {
-          state.results = payload.results.map(
-            (item: { name: string; url: string }) => ({
-              name: item.name,
-              description: item.url,
-            })
-          );
-          state.isLoading = false;
-        }
-      )
-      .addMatcher(
-        pokemonApi.endpoints.getPokemons.matchRejected,
-        (state, { error }) => {
-          state.isLoading = false;
-          state.error = error.message || 'Something went wrong';
-        }
-      );
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
+    setError: (state, action: PayloadAction<string | null>) => {
+      state.error = action.payload;
+    },
   },
 });
 
-export const { toggleSelectedItem, unselectAllItems } = pokemonSlice.actions;
+export const {
+  setResults,
+  toggleSelectedItem,
+  unselectAllItems,
+  setLoading,
+  setError,
+} = pokemonSlice.actions;
 
 export default pokemonSlice.reducer;

@@ -1,26 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
+import { GetStaticProps } from 'next';
 import pokeApiLogo from '../public/assets/pokeapi_256.3fa72200.png';
 import Search from '../src/components/Search/Search';
 import ResultList from '../src/components/ResultList/ResultList';
 import Pagination from '../src/components/Pagination/Pagination';
 import Flyout from '../src/components/Flyout/Flyout';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  useGetPokemonsQuery,
-  useGetPokemonDetailsQuery,
-} from '../src/services/pokemonApi';
+import { fetchPokemons } from '../src/services/pokemonApi';
 import { useTheme } from '../src/hooks/useTheme';
 import { RootState } from '../src/reducers';
 import { unselectAllItems } from '../src/reducers/pokemonSlice';
 import { useRouter } from 'next/router';
 
-const HomePage: React.FC<{
-  setErrorMessage: (msg: string | null) => void;
-}> = () => {
+type Pokemon = {
+  name: string;
+  description: string;
+};
+
+type HomePageProps = {
+  pokemons: Pokemon[];
+};
+
+const HomePage: React.FC<HomePageProps> = ({ pokemons }) => {
   const { theme, setTheme } = useTheme();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string | null>(null);
+  const [filteredResults, setFilteredResults] = useState<Pokemon[]>(pokemons);
   const dispatch = useDispatch();
   const selectedItems = useSelector(
     (state: RootState) => state.pokemon.selectedItems
@@ -29,66 +34,31 @@ const HomePage: React.FC<{
   const router = useRouter();
   const page = parseInt((router.query.page as string) || '1', 10);
 
-  const limit = 10;
-  const offset = (page - 1) * limit;
-
-  const {
-    data: pokemonListData,
-    error: listError,
-    isLoading: listLoading,
-  } = useGetPokemonsQuery({ limit, offset });
-  const {
-    data: searchedPokemonData,
-    error: searchError,
-    isLoading: searchLoading,
-  } = useGetPokemonDetailsQuery(searchTerm, {
-    skip: !searchTerm,
-  });
-
-  const handleSearch = (term: string) => {
-    setSearchTerm(term.trim() === '' ? null : term);
-    setErrorMessage(null);
-    router.push('/?page=1');
+  const handleSearch = async (term: string) => {
+    if (term) {
+      const lowerCaseTerm = term.toLowerCase();
+      const results = pokemons.filter((pokemon) =>
+        pokemon.name.toLowerCase().includes(lowerCaseTerm)
+      );
+      setFilteredResults(results);
+      if (results.length === 0) {
+        setErrorMessage('No results found for the given term');
+      } else {
+        setErrorMessage(null);
+      }
+    } else {
+      setFilteredResults(pokemons);
+      setErrorMessage(null);
+    }
   };
 
   const goToPage = (newPage: number) => {
-    setSearchTerm(null);
     router.push(`/?page=${newPage}`);
   };
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   };
-
-  const loading = searchTerm ? searchLoading : listLoading;
-  const error = searchTerm ? searchError : listError;
-  const results = searchTerm
-    ? searchedPokemonData
-      ? [
-          {
-            name: searchedPokemonData.name,
-            description: searchedPokemonData.species.url,
-          },
-        ]
-      : []
-    : pokemonListData
-      ? pokemonListData.results.map((item: { name: string; url: string }) => ({
-          name: item.name,
-          description: item.url,
-        }))
-      : [];
-
-  useEffect(() => {
-    if (errorMessage) {
-      setErrorMessage(errorMessage);
-    }
-  }, [errorMessage]);
-
-  useEffect(() => {
-    if (error) {
-      setErrorMessage('No results found for the given term');
-    }
-  }, [error]);
 
   const handleUnselectAll = () => {
     dispatch(unselectAllItems());
@@ -133,7 +103,6 @@ const HomePage: React.FC<{
         <Search onSearch={handleSearch} />
       </section>
       <section className="result">
-        {loading && <p>Loading...</p>}
         {errorMessage && (
           <>
             <p>{errorMessage}</p>
@@ -142,9 +111,9 @@ const HomePage: React.FC<{
             </button>
           </>
         )}
-        {!loading && !errorMessage && (
+        {!errorMessage && (
           <>
-            <ResultList results={results} />
+            <ResultList results={filteredResults} />
             <Pagination currentPage={page} onPageChange={goToPage} />
           </>
         )}
@@ -156,6 +125,21 @@ const HomePage: React.FC<{
       />
     </main>
   );
+};
+
+// Static generation
+export const getStaticProps: GetStaticProps = async () => {
+  const limit = 10;
+  const pokemons = await fetchPokemons({ limit, offset: 0 });
+
+  return {
+    props: {
+      pokemons: pokemons.results.map((item: { name: string; url: string }) => ({
+        name: item.name,
+        description: item.url,
+      })),
+    },
+  };
 };
 
 export default HomePage;

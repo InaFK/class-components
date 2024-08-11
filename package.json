@@ -7,6 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "preview": "next preview",
     "lint": "next lint",
     "lint:ignore": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format:fix": "prettier --write 'src/**/*.{ts,tsx}'",

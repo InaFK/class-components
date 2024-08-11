@@ -8,13 +8,15 @@ interface Props {
 const useSearchQuery = () => {
   const [searchQuery, setSearchQuery] = useState<string>(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('searchQuery') || '';
+      return window.localStorage.getItem('searchQuery') || '';
     }
     return '';
   });
 
   useEffect(() => {
-    localStorage.setItem('searchQuery', searchQuery);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('searchQuery', searchQuery);
+    }
   }, [searchQuery]);
 
   return [searchQuery, setSearchQuery] as const;
@@ -24,7 +26,7 @@ const Search: React.FC<Props> = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useSearchQuery();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+    setSearchQuery((e.target as HTMLInputElement).value);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
